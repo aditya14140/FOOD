@@ -5,9 +5,22 @@
     align-items: center;
 }
 
+  
+
 .navbar .logo {
-    width: 190px;
+    width: 150px;
 }
+body.light-mode {
+    background-color: #FFFFFF;
+    color:#333b3c
+  }
+  
+  body.dark-mode {
+    background-color: #000000;
+    color:white;
+  }
+  
+
 
 .navbar-menu {
     display: flex;

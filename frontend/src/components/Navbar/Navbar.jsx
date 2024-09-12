@@ -1,23 +1,37 @@
-import React, { useContext, useEffect, useState } from 'react'
-import './Navbar.css'
-import { assets } from '../../assets/assets'
-import { Link, useNavigate } from 'react-router-dom'
-import { StoreContext } from '../../Context/StoreContext'
+
+import React, { useContext, useEffect, useState } from 'react';
+import './Navbar.css';
+import { assets } from '../../assets/assets';
+import { Link, useNavigate } from 'react-router-dom';
+import { StoreContext } from '../../Context/StoreContext';
+import Switch from "react-switch";
 
 const Navbar = ({ setShowLogin }) => {
-
   const [menu, setMenu] = useState("home");
-  const { getTotalCartAmount, token ,setToken } = useContext(StoreContext);
+  const [theme, setTheme] = useState("light"); // Add this state
+  const { getTotalCartAmount, token, setToken } = useContext(StoreContext);
   const navigate = useNavigate();
 
   const logout = () => {
     localStorage.removeItem("token");
     setToken("");
-    navigate('/')
+    navigate('/');
   }
 
+  useEffect(() => {
+    const localTheme = localStorage.getItem("theme");
+    if (localTheme) {
+      setTheme(localTheme);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+    document.body.classList.toggle("dark", theme === "dark");
+  }, [theme]);
+
   return (
-    <div className='navbar'>
+    <div className={`navbar ${theme === "dark" ? "dark" : ""}`}>
       <Link to='/'><img className='logo' src={assets.logo} alt="" /></Link>
       <ul className="navbar-menu">
         <Link to="/" onClick={() => setMenu("home")} className={`${menu === "home" ? "active" : ""}`}>home</Link>
@@ -31,20 +45,45 @@ const Navbar = ({ setShowLogin }) => {
           <img src={assets.basket_icon} alt="" />
           <div className={getTotalCartAmount() > 0 ? "dot" : ""}></div>
         </Link>
-        {!token ? <button onClick={() => setShowLogin(true)}>sign in</button>
-          : <div className='navbar-profile'>
+        <Switch 
+  className='adi' 
+  id={`switch-${theme}`} 
+  onChange={() => {
+    setTheme(theme === "light" ? "dark" : "light");
+    document.body.classList.toggle("light-mode");
+    document.body.classList.toggle("dark-mode");
+  }} 
+  checked={theme === "dark"} 
+  onColor='FFD580' 
+  offColor='#111' 
+/>
+
+
+
+
+        {!token ? (
+          <button onClick={() => setShowLogin(true)}>sign in</button>
+        ) : (
+          <div className='navbar-profile'>
             <img src={assets.profile_icon} alt="" />
             <ul className='navbar-profile-dropdown'>
-              <li onClick={()=>navigate('/myorders')}> <img src={assets.bag_icon} alt="" /> <p>Orders</p></li>
+              <li onClick={() => navigate('/myorders')}>
+                <img src={assets.bag_icon} alt="" />
+                <p>Orders</p>
+              </li>
               <hr />
-              <li onClick={logout}> <img src={assets.logout_icon} alt="" /> <p>Logout</p></li> 
+              <li onClick={logout}>
+                <img src={assets.logout_icon} alt="" />
+                <p>Logout</p>
+              </li>
             </ul>
           </div>
-        }
-
+        )}
       </div>
     </div>
   )
 }
 
-export default Navbar
+export default Navbar;
+
+
